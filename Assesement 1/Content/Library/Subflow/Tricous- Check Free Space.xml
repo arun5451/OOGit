@@ -1,0 +1,706 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow id="1deacb2d-2d8a-4572-a607-ffc0b3d78fe4">
+  <descriptionCdata><![CDATA[1deacb2d-2d8a-4572-a607-ffc0b3d78fe4.6ebce5c9-801a-4384-81c5-68d2f68f0013.description=<pre>\nThis operation executes PowerShell scripts on a given host.\n\nInputs\:\n    host - The hostname or IP address of the PowerShell host. If you specify this input then you should not specify URI and shellURI.\nDefault value\: localhost\n    URI - Specifies a Uniform Resource Identifier (URI) that defines the connection endpoint for the interactive session. \nValue format\: <Transport>\://<ComputerName>\:<Port>/<ApplicationName>\nExample\: http\://exch2010CAS1/Powershell?serializationLevel\=Full\n    shellURI - Gets the Uniform Resource Identifier (URI) of the shell that is launched when the connection is made.\nExample\: http\://schemas.microsoft.com/powershell/Microsoft.Exchange\n    username - The username to use when connecting to the server.\nValue format\: username@domain or domain\\username.\n    password - The password to use when connecting to the server.\n    configurationName - The name of the PSSessionConfiguration to use. This can be used to target specific versions of PowerShell if the PSSessionConfiguration is properly configured on the target. By default, after PSRemoting is enabled on the target, the configuration name for PowerShell v5 or lower is 'microsoft.powershell', for PowerShell v6 is 'PowerShell.6', for PowerShell v7 is 'PowerShell.7'. Additional configurations can be created by the user on the target machines.\nValid values\: any PSConfiguration that exists on the host.\nExamples\: 'microsoft.powershell', 'PowerShell.6', 'PowerShell.7'\n    authType - Specifies the mechanism that is used to authenticate the user's credentials. \nValid values\: Default, Basic, Negotiate, NegotiateWithImplicitCredential, Credssp, Digest and Kerberos. (case-insensitive)\nDefault value\: Default\n    connectionTimeout - Determines how long the client computer waits for the remote session connection to be established. When the interval expires, the command to establish the connection fails. Enter a positive value in milliseconds.\nDefault value\: 180000 (3 minutes).\n    scriptTimeout - Determines how long the client computer waits for the PowerShell script to be executed. When the interval expires, the operation fails. Enter a positive value in milliseconds. An empty value means no time-out; the script execution continues indefinitely.\n    useSSL - If true, the operation uses the Secure Sockets Layer (SSL) protocol to establish a connection to the remote computer. By default, SSL is not used. WS-Management encrypts all Windows PowerShell content transmitted over the network. UseSSL is an additional protection that sends the data across an HTTPS connection instead of an HTTP connection. Default port for SSL is 5986.\nDefault value\: false\n    skipCACheck - Indicates whether, when connecting over HTTPS, the client does not validate that the server certificate is signed by a trusted certificate authority (CA).\nDefault value\: true\n    skipCNCheck - Indicates whether the certificate common name (CN) of the server and the hostname of the server are not checked for being the same.\nDefault value\: true\n    port - Specifies the network port on the remote computer that is used for this connection. To connect to a remote computer, the remote computer must be listening on the port that the connection uses. The default ports are 5985 (the WinRM port for HTTP) and 5986 (the WinRM port for HTTPS).\n    keepSessionAlive - If true, the operation will not close the PowerShell runspace (i.e. the PSSession in case of remote connections ) created during the execution and returns the runspaceID as the result of the operation. Actually the PowerShell runspace is saved in the OO session and can be used in other operations using the runspaceID result of previous operation.\nDefault value\: false\n    enablePiping - If true the operation enables piping the way PowerShell does. This input should be used only when keepSessionAlive input is true. First time the piped objects are null and the scope is to save the objects resulted from the PowerShell script execution. Next time the piped objects can be refered in the script as "$_" objects.\nDefault value\: false\nExample\: First, run "Get-Service" script with enablePiping\=true and keepSessionAlive\=true, then run the script  "Select-Object -property name,displayname,status|where-object {$_.Name -lt "C"}" with enablePiping\=true keepSessionAlive\=true. Observe the use of "$_".\n    runspaceID - If not empty, the operation will search the OO session for keys which equal the runspaceID. If the operation finds the runspace specified by the runspaceID it tries to use it and does not create another PowerShell runspace with provided inputs. If the runspace exists but is broken or unavailable the operation uses its authentication parameters and tries to reconnect and recreate the PowerShell runspace. Please note that the operation will use the connection parameters of the runspace identified by runspaceID, not the values provided as user inputs. The operation will take into consideration the connection inputs (i.e. host, username, password, authType, useSSL, etc.) provided by user only if the runspaceID does not exist in the OO session.\n    modules - A list of PowerShell modules to load after the PowerShell connection is established. Each value from the list specifies the name of the module to import. Enter the name of the module or the name of a file in the module, such as a .psd1, .psm1, .dll, or ps1 file. File paths are optional. Wildcards are not permitted. Specify only the module name whenever possible. When you specify a file name, only the members that are implemented in that file are imported. If the module contains other files, they are not imported, and you might be missing important members of the module. The list of modules should be separated by comma "," delimiter.\nExample\: FailoverClusters\n    snapins - A list of PowerShell snapins to load after the PowerShell connection is established. Each value from the list specifies the name of a registered snapin (i.e. the Name, not the AssemblyName or ModuleName).\nExample\: Microsoft.Exchange.Management.PowerShell.E2010\n    script - The script to execute on the PowerShell host. If you want to execute a script from file just provide the file path. Check the notes section for security implications of using this input.\nExample\:c\:\\PowerShellScripts\\GetHost.ps1\n    cmdlet - The name of the PowerShell cmdlet to invoke. If the cmdlet has additional parameters, please provide them as inputs to the operation. If the parameter has the same name as one of the operation's inputs just prefix it with "_". This input is intended to be used together with the PowerShell wizard so please use the script input whenever it's possible.\n    returnTable - If true, the operation will return a table containing a row for each PSObject that the script emits. The table's columns represent the properties of these PSObjects, in the propertyName<delimiter>propertyValue format. If false the operation returns a string representation of the result similar to the output from the PowerShell console.\nDefault value\: false\n    delimiter - The delimiter used to separate each property name from the property value in the output table.\nDefault value\: "\:".\n    colDelimiter - The delimiter used to separate columns in the output table.\nDefault value\: ",".\n    rowDelimiter - The delimiter used to separate rows in the output table.\nDefault value\: newline.\n    hideResults - If this input is added and set to true, the "script", "stdout" and "warnings" results will be hidden. In case of operation failure the "returnResult" will no longer contain the Powershell exception stack-trace details, but the generic message\: "Could not execute powershell command". To use this input you need to manually add it from Studio Inputs tab of the operation, by clicking on the \u201CAdd Input\u201D button.\nValid values\: true, false\nDefault value\: false\n    hideScript - If this input is added and set to true, the "script" result will be hidden. To use this input you need to manually add it from Studio Inputs tab of the operation, by clicking on the \u201CAdd Input\u201D button. In case a value is provided to the hideResults input the hideScript input will be ignored.\nValid values\: true, false\nDefault value\: false\n    localPSRemoting - If this input is added and set to \u2018true\u2019 the operation will use remote impersonation on the local IP address (localhost/loopback) and PowerShell remoting on the same address to execute the script. In this case the credentials under which the script will run must be provided through the \u201Cusername\u201D and \u201Cpassword\u201D inputs. The \u201Chostname\u201D input should be the local ip address or the localhost/loopback address. In case the \u201Chostname\u201D it is left empty the \u2018localhost\u2019 address will be used by default. To use this input you need to manually add it from Studio Inputs tab of the operation, by clicking on the \u201CAdd Input\u201D button.\nValid values\: true, false\nDefault value\: false\n    getLastExitCode - If true, the operation will add $LASTEXITCODE at the end of the script and return the lastExitCode result, if false the lastExitCode result will be empty. Please note that $LASTEXITCODE will be displayed at the end of the "script" result and the "returnResult" result will contain new line at the end which contains a numberfrom 0 to 255 which represents the exit code of the last command in the script. \nValid values\: true, false\nDefault value\: false\n\nResults\:\n    returnResult - The result of the script execution formatted as table or string depending on the returnTable input value as described above. In case of operation failure and "hideResults" is set to true, then this output will no longer contain the powershell exception stacktrace details.\n    script - The actual PowerShell script that was run. This result might be useful when piping is enabled or you want to know exactly the script that was sent to be run on the PowerShell host. Please note that the operation adds "Out-String" command to the end of your script if returnTable input is set to false. This output will be hidden if "hideResults" input is set to true.\n    objectsCount - The number of the PowerShell objects resulted from script execution (e.g. Get-Service will return the number of services found on the target host). This input is relevant only when returnTable is set to true. Otherwise, the value of this result will always be one, because the script returns a string message.\n    warnings - A list of warnings that the cmdlets emit. If the cmdlets were executed without warnings, then this result will be an empty string. This output will be hidden if "hideResults" input is set to true.\n    runspaceID - The runspace ID of the PowerShell runspace created during the execution of the operation.\n    stdout - The result of the commands that succeeded in case the operation fails. In case of operation failure this output will be hidden if "hideResults" input is set to true.\n    lastExitCode -  Holds the last exit code in the powershell script if getLastExitCode is set to true.\n\nResponses\:\n    success - The Powershell script or cmdlet was executed successfully.\n    failure - The command could not be executed.\n\nNotes\:\n1. In order to enable PowerShell scripts execution, run the following command\: Set-ExecutionPolicy RemoteSigned\n2. When interacting with a Microsoft Exchange server, please use the generic Powershell operation available in the Business Application content pack, under /Library/Operations/Exchange/<version specific> folder, instead of loading the Exchange snap-in to this Powershell Script operation. This is a Microsoft Exchange design (http\://www.get-exchange.info/2012/12/30/powershell-scripting-for-exchange-server-some-tips/)\n3. If the "hideResults" is set to false the "script" output will be added to the operation's output in which case the exact script that was executed will be displayed. Displaying the script could be a security risk when encrypted variables (which could be the sensitive data) are passed and referenced in the script, as they will be displayed unobfuscated. Also in case of operation failure the "stdout", "warnings" and "returnResults" outputs could contain the script with unobfuscated sensitive variables in it.\n4. The \u201ClocalPSRemoting\u201D input provides a workaround/alternative to PowerShell impersonation on localhost. It enables the operation to run the script under different users on the local machine.\n5. Use the 'script' input with caution as it can expose the target system to security risks. By exposing the script input as a prompt to the user, it will enable the user to execute any powershell script on the target system taking into account the permissions of the credentials given as inputs.\n6. When keepSessionAlive is set to true and the operation is left to run for many a long time (e.g. hours), the RAS/worker service can crash with an OutOfMemory error. This is expected because while the session is kept open, data accumulates in memory which is released only after the operation completes. To address this issue check HPE OO Administrator Guide on how to increase RAS/worker memory.\n</pre>
+1deacb2d-2d8a-4572-a607-ffc0b3d78fe4.86a3d001-b95a-49a9-832a-c9e411359401.description=<pre>\nCreates a blank Excel spreadsheet document. The format of the document (XLS or XLSX) depends on the extension used by the file.\n\nInputs\:\n    excelFileName - The absolute path to the new Excel document.\nExamples\: c\:\\temp\\test.xls\n    worksheetNames - A delimited list of names that will be created as worksheets in the document. \nDefault value\: Sheet1,Sheet2,Sheet3.\n    delimiter - The character used to delimit worksheet names.\nDefault value\: comma (,)\n\nResult\:\n    returnResult - This is the primary output. Returns a success or failure message.\n\nResponses\:\n    success - A new Excel document is created successfully.\n    failure - Failed to create a new Excel document.\n\nNotes\:\nXLSM format is not supported.\n</pre>
+1deacb2d-2d8a-4572-a607-ffc0b3d78fe4.8f5578f9-a29c-47f9-bea7-f65a275b00bc.description=<pre>\nAdds rows of data to an Excel document. This operation can be used to add/insert/update data to worksheets and documents. \nXLS, XLSX and XLSM formats are supported. \n\nInputs\:\n    excelFileName - The absolute path to the new Excel document.\nExamples\: c\:\\temp\\test.xls\n    worksheetName - The worksheet to which the data should be added.\nDefault value\: Sheet1 \n    headerData - A delimited list of column names. If left blank, the document will not have a header for the data.\n    rowData - A delimited list of data.\n    columnDelimiter - A delimiter used to separate columns of rowData and headerData.\nDefault value\: comma (,)\n    rowsDelimiter - A delimiter used to separate rows of rowData.\nDefault value\: pipe (|)\n    rowIndex - A list of row indexes.\nExamples\: 1\:3, 10, 15\:20,25\nDefault value\: append from the last row of the Excel worksheet.\n    columnIndex - A list of column indexes.\nExamples\: 1\:3, 10, 15\:20,25\nDefault value\: from index 0 in the Excel worksheet.\n    overwriteData - true if existing data should be overwritten.\nDefault value\: false\n\n\nResult\:\n    returnResult - This is the primary output. Returns the number of rows that were added.\n\nResponses\:\n    success - One or more rows of data were added successfully.\n    failure - Failed to add rows of data to the Excel document.\n\n\nNotes\:\n1. All the index inputs are 0 based.\n2. If rowIndex input is not empty the row count must be equal to the row count of rowData.\n3. If columnIndex input is not empty the column count must be equal to the column count of rowData\n4. If columnIndex input is not empty it's used for every row that is added.\n5. If the rowData contains a numeric value, the cell modified is set to numeric type.\n6. There's a limitation that if the rowData is a date or time value, the operation treats it as a string value.\n7. If there's any change in the worksheet, all values of formula type cells are updated.\n8. If there's any merged region existed in the worksheet, only the top left cell can be modified.\n\nExamples\:\n1. To add a header and a single row of data to an Excel document using comma as the column delimiter, input should be given as follows-\nheaderData - columnName1,columnName2,columnName3\nrowData - value1,value2,value3\ncolumnDelimiter - ,\n\n2. To add a header and multiple rows of data to an Excel document using comma (,) as the column delimiter and pipe (|) as the row delimiter, input should be given as follows-\nheaderData \t- columnName1,columnName2,columnName3\nrowData - value11,value12,value13|value21,value22,value23|value31,value32,value33\ncolumnDelimiter - ,\nrowDelimiter\t- |\n\n3. To add multiple rows of data on multiple columns to an Excel document using comma (,) as the column delimiter and pipe (|) as the row delimiter, input should be given as follows-\nrowData - value11,value12,value13|value21,value22,value23|value31,value32,value33\ncolumnDelimiter - ,\nrowDelimiter\t- |\nrowIndex - 1,3,4\ncolumnIndex - 3\:5\n</pre>
+]]></descriptionCdata>
+  <annotation></annotation>
+  <name>Tricous- Check Free Space</name>
+  <categories/>
+  <inputs/>
+  <possibleResponses>
+    <opResponse id="715c0e7b-5faf-44d8-89a4-cc03e7cfeda6">
+      <annotation></annotation>
+      <name>failure</name>
+      <isDefault>false</isDefault>
+      <onFailure>true</onFailure>
+      <type>ERROR</type>
+      <matchRules/>
+    </opResponse>
+    <opResponse id="7d0fd80c-9987-4902-8726-0ab0530a5af5">
+      <annotation></annotation>
+      <name>success</name>
+      <isDefault>true</isDefault>
+      <onFailure>false</onFailure>
+      <type>RESOLVED</type>
+      <matchRules/>
+    </opResponse>
+  </possibleResponses>
+  <availableResultExpressions/>
+  <resultExpression id="eae07966-2727-4ad1-90be-365cba88f12b">
+    <annotation></annotation>
+    <name>FailureMessage</name>
+    <fieldName>FailureMessage</fieldName>
+    <sourceType>RAWRESULT</sourceType>
+    <filters/>
+  </resultExpression>
+  <iconSpec id="3e12cdb2-c057-4679-9bc6-2cdb5e1ce845">
+    <baseIcon>flow.png</baseIcon>
+    <basePath>System</basePath>
+    <readOnly>false</readOnly>
+    <layers/>
+  </iconSpec>
+  <callouts/>
+  <checkPointFlow>true</checkPointFlow>
+  <compatibleRuntimeContext>false</compatibleRuntimeContext>
+  <historyCheckPointFlow>true</historyCheckPointFlow>
+  <steps>
+    <step id="6ebce5c9-801a-4384-81c5-68d2f68f0013">
+      <annotation>1deacb2d-2d8a-4572-a607-ffc0b3d78fe4.6ebce5c9-801a-4384-81c5-68d2f68f0013.description</annotation>
+      <name>PowerShell Script</name>
+      <bounds>
+        <x>120.0</x>
+        <y>150.0</y>
+      </bounds>
+      <layer>-1</layer>
+      <hideInbound>false</hideInbound>
+      <iconSpec id="cf17ae72-0c39-4a87-8a4b-a4a992f1b95e">
+        <baseIcon>PowerShell.png</baseIcon>
+        <basePath>/Operating System/</basePath>
+        <readOnly>false</readOnly>
+        <layers/>
+      </iconSpec>
+      <addResultToRunContext>false</addResultToRunContext>
+      <isCriticalStep>false</isCriticalStep>
+      <isNonBlocking>false</isNonBlocking>
+      <isParallelStep>false</isParallelStep>
+      <isSingleResponse>false</isSingleResponse>
+      <recordInHistory>false</recordInHistory>
+      <recordRawOutput>true</recordRawOutput>
+      <recordPrimaryOutput>true</recordPrimaryOutput>
+      <checkPointStep>true</checkPointStep>
+      <historyCheckPointStep>true</historyCheckPointStep>
+      <scriptResultStep>false</scriptResultStep>
+      <userPrompt></userPrompt>
+      <bindings>
+        <staticBinding id="3cb7fda9-6dee-408d-a89a-1e2c57dfd486">
+          <annotation></annotation>
+          <toContextKey></toContextKey>
+          <fromContextKey></fromContextKey>
+          <assignFromContext>false</assignFromContext>
+          <assignToContext>false</assignToContext>
+          <inputType>STRING</inputType>
+          <isList>false</isList>
+          <required>false</required>
+          <isPersisted>true</isPersisted>
+          <inputSymbol>host</inputSymbol>
+          <listDelimiter>,</listDelimiter>
+          <value>localhost</value>
+          <record>false</record>
+        </staticBinding>
+        <staticBinding id="cf5c10c1-a6b6-4bf1-a3bd-673ecb6c6b3f">
+          <annotation></annotation>
+          <assignFromContext>false</assignFromContext>
+          <assignToContext>false</assignToContext>
+          <inputType>STRING</inputType>
+          <isList>false</isList>
+          <required>false</required>
+          <isPersisted>true</isPersisted>
+          <inputSymbol>script</inputSymbol>
+          <listDelimiter>,</listDelimiter>
+          <value>$freespace = get-WmiObject win32_logicaldisk -Filter &quot;DeviceID=&apos;C:&apos;&quot; | Select-Object DeviceID,Size,FreeSpace
+Write-Output ($freespace.DeviceID +&quot;|&quot;+ $freespace.Size +&quot;|&quot;+ $freespace.FreeSpace)</value>
+          <record>false</record>
+        </staticBinding>
+      </bindings>
+      <transitions>
+        <transition id="4969f254-2d5f-4e73-9ed8-768acfce3a51">
+          <annotation></annotation>
+          <name>failure</name>
+          <command>NEXT</command>
+          <linkMode>false</linkMode>
+          <responseSymbol>failure</responseSymbol>
+          <shouldHandoff>false</shouldHandoff>
+          <transitionValue>0.0</transitionValue>
+          <destination>
+            <refId>22c7f144-a97a-468b-9b28-577be25064f5</refId>
+          </destination>
+          <source>
+            <refId>6ebce5c9-801a-4384-81c5-68d2f68f0013</refId>
+          </source>
+          <positions>
+            <point>
+              <x>174.0</x>
+              <y>149.0</y>
+            </point>
+            <point>
+              <x>170.0</x>
+              <y>334.0</y>
+            </point>
+          </positions>
+          <labelPosition>
+            <x>333.0</x>
+            <y>0.0</y>
+          </labelPosition>
+        </transition>
+        <transition id="dc400522-1f00-4b29-aa9f-bc756cd4229f">
+          <annotation></annotation>
+          <name>success</name>
+          <command>NEXT</command>
+          <linkMode>false</linkMode>
+          <responseSymbol>success</responseSymbol>
+          <shouldHandoff>false</shouldHandoff>
+          <transitionValue>0.0</transitionValue>
+          <destination>
+            <refId>86a3d001-b95a-49a9-832a-c9e411359401</refId>
+          </destination>
+          <source>
+            <refId>6ebce5c9-801a-4384-81c5-68d2f68f0013</refId>
+          </source>
+          <positions>
+            <point>
+              <x>174.0</x>
+              <y>149.0</y>
+            </point>
+            <point>
+              <x>440.0</x>
+              <y>155.0</y>
+            </point>
+          </positions>
+          <labelPosition>
+            <x>333.0</x>
+            <y>0.0</y>
+          </labelPosition>
+        </transition>
+      </transitions>
+      <properties/>
+      <opRef>
+        <refId>f0b2afd2-5733-47e4-80ba-7f2387cc66d5</refId>
+      </opRef>
+      <assignments>
+        <flowVariableAssignment id="0d353d10-a55f-4f92-bd66-344ddec40435">
+          <annotation></annotation>
+          <name>assignment</name>
+          <action>OVERWRITE</action>
+          <assignmentTargetType>FLOW_OUTPUT_FIELD</assignmentTargetType>
+          <contextKey>freeSpace</contextKey>
+          <expression id="151d90a4-68f9-45f3-8831-67bd852e2690">
+            <annotation></annotation>
+            <name>Result Field: returnResult</name>
+            <fieldName>returnResult</fieldName>
+            <sourceType>RAWRESULT</sourceType>
+            <filters>
+              <stripTrailingFilter id="866d46e6-64de-4a7d-a579-e79c100f3831">
+                <annotation></annotation>
+                <name>Strip</name>
+                <strip>|</strip>
+                <type>ALL_CHARACTERS_UP_TO_AND_INCLUDING</type>
+              </stripTrailingFilter>
+              <stripTrailingFilter id="ae9c8c62-a667-4a7d-8849-93133f0037c7">
+                <annotation></annotation>
+                <name>Strip</name>
+                <strip>|</strip>
+                <type>ALL_CHARACTERS_UP_TO_AND_INCLUDING</type>
+              </stripTrailingFilter>
+            </filters>
+          </expression>
+        </flowVariableAssignment>
+        <flowVariableAssignment id="6183d704-4b6c-46d3-bf55-e9c2b67b44b2">
+          <annotation></annotation>
+          <name>assignment</name>
+          <action>OVERWRITE</action>
+          <assignmentTargetType>FLOW_OUTPUT_FIELD</assignmentTargetType>
+          <contextKey>totalSize</contextKey>
+          <expression id="dd310429-4c2f-4d5d-bcd8-66c1cfb8fffc">
+            <annotation></annotation>
+            <name>Result Field: returnResult</name>
+            <fieldName>returnResult</fieldName>
+            <sourceType>RAWRESULT</sourceType>
+            <filters>
+              <stripTrailingFilter id="9798abb5-ef70-43f2-b2f5-c862edfff096">
+                <annotation></annotation>
+                <name>Strip</name>
+                <strip>|</strip>
+                <type>ALL_CHARACTERS_UP_TO_AND_INCLUDING</type>
+              </stripTrailingFilter>
+              <stripTrailingFilter id="984dfa69-699d-4f81-bbff-ca6da6ab7a0e">
+                <annotation></annotation>
+                <name>Strip</name>
+                <strip>|</strip>
+                <type>ALL_CHARACTERS_AFTER_AND_INCLUDING</type>
+              </stripTrailingFilter>
+            </filters>
+          </expression>
+        </flowVariableAssignment>
+        <flowVariableAssignment id="dfae73ca-99f0-4d57-af05-4732928dbc57">
+          <annotation></annotation>
+          <name>assignment</name>
+          <action>OVERWRITE</action>
+          <assignmentTargetType>FLOW_VARIABLE</assignmentTargetType>
+          <contextKey>utilization</contextKey>
+          <expression id="cc0b8841-8cc6-4e92-84ba-2ad138d1d990">
+            <annotation></annotation>
+            <name>Result Field: returnResult</name>
+            <fieldName>returnResult</fieldName>
+            <sourceType>RAWRESULT</sourceType>
+            <filters/>
+          </expression>
+        </flowVariableAssignment>
+      </assignments>
+      <throttleSize>0</throttleSize>
+    </step>
+    <step id="86a3d001-b95a-49a9-832a-c9e411359401">
+      <annotation>1deacb2d-2d8a-4572-a607-ffc0b3d78fe4.86a3d001-b95a-49a9-832a-c9e411359401.description</annotation>
+      <name>New Excel Document</name>
+      <bounds>
+        <x>390.0</x>
+        <y>150.0</y>
+      </bounds>
+      <layer>-1</layer>
+      <hideInbound>false</hideInbound>
+      <iconSpec id="1e725124-dd76-4bae-8be7-758d9c7f6a66">
+        <baseIcon>sql_query.png</baseIcon>
+        <basePath>/Databases/</basePath>
+        <readOnly>false</readOnly>
+        <layers/>
+      </iconSpec>
+      <addResultToRunContext>false</addResultToRunContext>
+      <isCriticalStep>false</isCriticalStep>
+      <isNonBlocking>false</isNonBlocking>
+      <isParallelStep>false</isParallelStep>
+      <isSingleResponse>false</isSingleResponse>
+      <recordInHistory>false</recordInHistory>
+      <recordRawOutput>true</recordRawOutput>
+      <recordPrimaryOutput>true</recordPrimaryOutput>
+      <checkPointStep>true</checkPointStep>
+      <historyCheckPointStep>true</historyCheckPointStep>
+      <scriptResultStep>false</scriptResultStep>
+      <userPrompt></userPrompt>
+      <bindings>
+        <staticBinding id="442de4aa-7822-4e95-8ccc-de094c9aa660">
+          <annotation></annotation>
+          <toContextKey></toContextKey>
+          <fromContextKey></fromContextKey>
+          <assignFromContext>false</assignFromContext>
+          <assignToContext>false</assignToContext>
+          <inputType>STRING</inputType>
+          <isList>false</isList>
+          <required>true</required>
+          <isPersisted>true</isPersisted>
+          <inputSymbol>excelFileName</inputSymbol>
+          <listDelimiter>,</listDelimiter>
+          <value>C:\OO Assignments\FreeSpace.xlsx</value>
+          <record>false</record>
+        </staticBinding>
+        <staticBinding id="8253bee6-5d46-4b0f-8b0c-fabe149bec0a">
+          <annotation></annotation>
+          <toContextKey></toContextKey>
+          <fromContextKey></fromContextKey>
+          <assignFromContext>false</assignFromContext>
+          <assignToContext>false</assignToContext>
+          <inputType>STRING</inputType>
+          <isList>false</isList>
+          <required>false</required>
+          <isPersisted>true</isPersisted>
+          <inputSymbol>worksheetNames</inputSymbol>
+          <listDelimiter>,</listDelimiter>
+          <value>Utilization Report</value>
+          <record>false</record>
+        </staticBinding>
+        <staticBinding id="4c08108d-6bef-4d81-bbfc-143245bf6c0f">
+          <annotation></annotation>
+          <toContextKey></toContextKey>
+          <fromContextKey></fromContextKey>
+          <assignFromContext>false</assignFromContext>
+          <assignToContext>false</assignToContext>
+          <inputType>STRING</inputType>
+          <isList>false</isList>
+          <required>false</required>
+          <isPersisted>true</isPersisted>
+          <inputSymbol>delimiter</inputSymbol>
+          <listDelimiter>,</listDelimiter>
+          <record>false</record>
+        </staticBinding>
+      </bindings>
+      <transitions>
+        <transition id="45158ff4-724a-457c-baef-bcc6b9e7b981">
+          <annotation></annotation>
+          <name>success</name>
+          <command>NEXT</command>
+          <linkMode>false</linkMode>
+          <responseSymbol>success</responseSymbol>
+          <shouldHandoff>false</shouldHandoff>
+          <transitionValue>0.0</transitionValue>
+          <destination>
+            <refId>8f5578f9-a29c-47f9-bea7-f65a275b00bc</refId>
+          </destination>
+          <source>
+            <refId>86a3d001-b95a-49a9-832a-c9e411359401</refId>
+          </source>
+          <positions>
+            <point>
+              <x>440.0</x>
+              <y>155.0</y>
+            </point>
+            <point>
+              <x>440.0</x>
+              <y>334.0</y>
+            </point>
+          </positions>
+          <labelPosition>
+            <x>333.0</x>
+            <y>0.0</y>
+          </labelPosition>
+        </transition>
+        <transition id="7766f4bd-1328-413d-9614-9fd1cac30745">
+          <annotation></annotation>
+          <name>failure</name>
+          <command>NEXT</command>
+          <linkMode>false</linkMode>
+          <responseSymbol>failure</responseSymbol>
+          <shouldHandoff>false</shouldHandoff>
+          <transitionValue>0.0</transitionValue>
+          <destination>
+            <refId>22c7f144-a97a-468b-9b28-577be25064f5</refId>
+          </destination>
+          <source>
+            <refId>86a3d001-b95a-49a9-832a-c9e411359401</refId>
+          </source>
+          <positions>
+            <point>
+              <x>440.0</x>
+              <y>155.0</y>
+            </point>
+            <point>
+              <x>170.0</x>
+              <y>334.0</y>
+            </point>
+          </positions>
+          <labelPosition>
+            <x>333.0</x>
+            <y>0.0</y>
+          </labelPosition>
+        </transition>
+      </transitions>
+      <properties/>
+      <opRef>
+        <refId>9d21ca68-7d03-4fb3-9478-03956532bf6f</refId>
+      </opRef>
+      <assignments/>
+      <throttleSize>0</throttleSize>
+    </step>
+    <step id="8f5578f9-a29c-47f9-bea7-f65a275b00bc">
+      <annotation>1deacb2d-2d8a-4572-a607-ffc0b3d78fe4.8f5578f9-a29c-47f9-bea7-f65a275b00bc.description</annotation>
+      <name>Add Excel Data</name>
+      <bounds>
+        <x>390.0</x>
+        <y>300.0</y>
+      </bounds>
+      <layer>-1</layer>
+      <hideInbound>false</hideInbound>
+      <iconSpec id="82c9c320-fddc-4f49-9ff4-0be089ea9834">
+        <baseIcon>sql_query.png</baseIcon>
+        <basePath>/Databases/</basePath>
+        <readOnly>false</readOnly>
+        <layers>
+          <iconSpec id="d2dc8ee9-d361-4d24-aa14-84a2bb979111">
+            <baseIcon>add.png</baseIcon>
+            <basePath>/Annotations/</basePath>
+            <readOnly>false</readOnly>
+            <layers/>
+          </iconSpec>
+        </layers>
+      </iconSpec>
+      <addResultToRunContext>false</addResultToRunContext>
+      <isCriticalStep>false</isCriticalStep>
+      <isNonBlocking>false</isNonBlocking>
+      <isParallelStep>false</isParallelStep>
+      <isSingleResponse>false</isSingleResponse>
+      <recordInHistory>false</recordInHistory>
+      <recordRawOutput>true</recordRawOutput>
+      <recordPrimaryOutput>true</recordPrimaryOutput>
+      <checkPointStep>true</checkPointStep>
+      <historyCheckPointStep>true</historyCheckPointStep>
+      <scriptResultStep>false</scriptResultStep>
+      <userPrompt></userPrompt>
+      <bindings>
+        <staticBinding id="122d878c-82bb-4bc4-8b44-605861404f1a">
+          <annotation></annotation>
+          <toContextKey></toContextKey>
+          <fromContextKey></fromContextKey>
+          <assignFromContext>false</assignFromContext>
+          <assignToContext>false</assignToContext>
+          <inputType>STRING</inputType>
+          <isList>false</isList>
+          <required>true</required>
+          <isPersisted>true</isPersisted>
+          <inputSymbol>excelFileName</inputSymbol>
+          <listDelimiter>,</listDelimiter>
+          <value>C:\OO Assignments\FreeSpace.xlsx</value>
+          <record>false</record>
+        </staticBinding>
+        <staticBinding id="20e016dd-4a96-4389-bcec-c1f2ead7f8da">
+          <annotation></annotation>
+          <toContextKey></toContextKey>
+          <fromContextKey></fromContextKey>
+          <assignFromContext>false</assignFromContext>
+          <assignToContext>false</assignToContext>
+          <inputType>STRING</inputType>
+          <isList>false</isList>
+          <required>false</required>
+          <isPersisted>true</isPersisted>
+          <inputSymbol>worksheetName</inputSymbol>
+          <listDelimiter>,</listDelimiter>
+          <value>Utilization Report</value>
+          <record>false</record>
+        </staticBinding>
+        <staticBinding id="21cd5481-a617-4923-a470-9f29d90f7d58">
+          <annotation></annotation>
+          <toContextKey></toContextKey>
+          <fromContextKey></fromContextKey>
+          <assignFromContext>false</assignFromContext>
+          <assignToContext>false</assignToContext>
+          <inputType>STRING</inputType>
+          <isList>false</isList>
+          <required>false</required>
+          <isPersisted>true</isPersisted>
+          <inputSymbol>headerData</inputSymbol>
+          <listDelimiter>,</listDelimiter>
+          <value>Drive Name|Totlal Size|FreeSpace</value>
+          <record>false</record>
+        </staticBinding>
+        <resultBinding id="176ec0e7-fed0-4e72-a6e2-a63978d3b5d0">
+          <annotation></annotation>
+          <toContextKey></toContextKey>
+          <fromContextKey>utilization</fromContextKey>
+          <assignFromContext>true</assignFromContext>
+          <assignToContext>false</assignToContext>
+          <inputType>STRING</inputType>
+          <isList>false</isList>
+          <required>true</required>
+          <isPersisted>true</isPersisted>
+          <inputSymbol>rowData</inputSymbol>
+          <listDelimiter>,</listDelimiter>
+          <record>false</record>
+        </resultBinding>
+        <staticBinding id="198a3792-b3eb-41a3-9878-653b56d23ed9">
+          <annotation></annotation>
+          <toContextKey></toContextKey>
+          <fromContextKey></fromContextKey>
+          <assignFromContext>false</assignFromContext>
+          <assignToContext>false</assignToContext>
+          <inputType>STRING</inputType>
+          <isList>false</isList>
+          <required>false</required>
+          <isPersisted>true</isPersisted>
+          <inputSymbol>columnDelimiter</inputSymbol>
+          <listDelimiter>,</listDelimiter>
+          <value>|</value>
+          <record>false</record>
+        </staticBinding>
+        <staticBinding id="9ab8f89b-333f-4b40-b34b-c49501452c2e">
+          <annotation></annotation>
+          <toContextKey></toContextKey>
+          <fromContextKey></fromContextKey>
+          <assignFromContext>false</assignFromContext>
+          <assignToContext>false</assignToContext>
+          <inputType>STRING</inputType>
+          <isList>false</isList>
+          <required>false</required>
+          <isPersisted>true</isPersisted>
+          <inputSymbol>rowsDelimiter</inputSymbol>
+          <listDelimiter>,</listDelimiter>
+          <value>,</value>
+          <record>false</record>
+        </staticBinding>
+        <staticBinding id="b4b48680-2755-47f3-87db-14363ac1f875">
+          <annotation></annotation>
+          <assignFromContext>false</assignFromContext>
+          <assignToContext>false</assignToContext>
+          <inputType>STRING</inputType>
+          <isList>false</isList>
+          <required>false</required>
+          <isPersisted>true</isPersisted>
+          <inputSymbol>rowIndex</inputSymbol>
+          <listDelimiter>,</listDelimiter>
+          <record>false</record>
+        </staticBinding>
+        <staticBinding id="b1997ce8-23f9-453d-b871-111e8232bbcd">
+          <annotation></annotation>
+          <assignFromContext>false</assignFromContext>
+          <assignToContext>false</assignToContext>
+          <inputType>STRING</inputType>
+          <isList>false</isList>
+          <required>false</required>
+          <isPersisted>true</isPersisted>
+          <inputSymbol>columnIndex</inputSymbol>
+          <listDelimiter>,</listDelimiter>
+          <record>false</record>
+        </staticBinding>
+        <staticBinding id="231700dc-6a08-46dd-885a-4c5ffac43465">
+          <annotation></annotation>
+          <assignFromContext>false</assignFromContext>
+          <assignToContext>false</assignToContext>
+          <inputType>STRING</inputType>
+          <isList>false</isList>
+          <required>false</required>
+          <isPersisted>true</isPersisted>
+          <inputSymbol>overwriteData</inputSymbol>
+          <listDelimiter>,</listDelimiter>
+          <record>false</record>
+        </staticBinding>
+      </bindings>
+      <transitions>
+        <transition id="eaefa9b5-1823-4b70-9203-8a41c9d29541">
+          <annotation></annotation>
+          <name>failure</name>
+          <command>NEXT</command>
+          <linkMode>false</linkMode>
+          <responseSymbol>failure</responseSymbol>
+          <shouldHandoff>false</shouldHandoff>
+          <transitionValue>0.0</transitionValue>
+          <destination>
+            <refId>22c7f144-a97a-468b-9b28-577be25064f5</refId>
+          </destination>
+          <source>
+            <refId>8f5578f9-a29c-47f9-bea7-f65a275b00bc</refId>
+          </source>
+          <positions>
+            <point>
+              <x>440.0</x>
+              <y>334.0</y>
+            </point>
+            <point>
+              <x>170.0</x>
+              <y>334.0</y>
+            </point>
+          </positions>
+          <labelPosition>
+            <x>333.0</x>
+            <y>0.0</y>
+          </labelPosition>
+        </transition>
+        <transition id="b7ce17af-565f-4ece-9cd8-1e58df3571a1">
+          <annotation></annotation>
+          <name>success</name>
+          <command>NEXT</command>
+          <linkMode>false</linkMode>
+          <responseSymbol>success</responseSymbol>
+          <shouldHandoff>false</shouldHandoff>
+          <transitionValue>0.0</transitionValue>
+          <destination>
+            <refId>e175e3c7-4a84-4b12-b9d0-61eef1660a33</refId>
+          </destination>
+          <source>
+            <refId>8f5578f9-a29c-47f9-bea7-f65a275b00bc</refId>
+          </source>
+          <positions>
+            <point>
+              <x>440.0</x>
+              <y>334.0</y>
+            </point>
+            <point>
+              <x>620.0</x>
+              <y>154.0</y>
+            </point>
+          </positions>
+          <labelPosition>
+            <x>333.0</x>
+            <y>0.0</y>
+          </labelPosition>
+        </transition>
+      </transitions>
+      <properties/>
+      <opRef>
+        <refId>4552e495-4595-4916-b58b-ce521bdb1e9a</refId>
+      </opRef>
+      <assignments/>
+      <throttleSize>0</throttleSize>
+    </step>
+    <returnStep id="22c7f144-a97a-468b-9b28-577be25064f5">
+      <annotation></annotation>
+      <name>Error : failure</name>
+      <bounds>
+        <x>120.0</x>
+        <y>300.0</y>
+      </bounds>
+      <layer>-1</layer>
+      <hideInbound>false</hideInbound>
+      <addResultToRunContext>false</addResultToRunContext>
+      <isCriticalStep>false</isCriticalStep>
+      <isNonBlocking>false</isNonBlocking>
+      <isParallelStep>false</isParallelStep>
+      <isSingleResponse>false</isSingleResponse>
+      <recordInHistory>false</recordInHistory>
+      <recordRawOutput>true</recordRawOutput>
+      <recordPrimaryOutput>true</recordPrimaryOutput>
+      <checkPointStep>true</checkPointStep>
+      <historyCheckPointStep>true</historyCheckPointStep>
+      <scriptResultStep>false</scriptResultStep>
+      <userPrompt></userPrompt>
+      <bindings/>
+      <transitions>
+        <transition id="fd389efb-5768-4b7c-b51c-f1828dcf4107">
+          <annotation></annotation>
+          <name>return</name>
+          <command>NEXT</command>
+          <linkMode>false</linkMode>
+          <responseSymbol>failure</responseSymbol>
+          <shouldHandoff>false</shouldHandoff>
+          <transitionValue>0.0</transitionValue>
+          <destination>
+            <refId>22c7f144-a97a-468b-9b28-577be25064f5</refId>
+          </destination>
+          <source>
+            <refId>22c7f144-a97a-468b-9b28-577be25064f5</refId>
+          </source>
+          <positions/>
+        </transition>
+      </transitions>
+      <properties/>
+      <returnStepType>ERROR</returnStepType>
+      <assignments/>
+    </returnStep>
+    <returnStep id="e175e3c7-4a84-4b12-b9d0-61eef1660a33">
+      <annotation></annotation>
+      <name>Resolved : success</name>
+      <bounds>
+        <x>600.0</x>
+        <y>150.0</y>
+      </bounds>
+      <layer>-1</layer>
+      <hideInbound>false</hideInbound>
+      <iconSpec id="1d62293c-b826-401d-8c1d-ce7bb7b96e99">
+        <baseIcon>return_success.png</baseIcon>
+        <basePath>System</basePath>
+        <readOnly>true</readOnly>
+        <layers/>
+      </iconSpec>
+      <addResultToRunContext>false</addResultToRunContext>
+      <isCriticalStep>false</isCriticalStep>
+      <isNonBlocking>false</isNonBlocking>
+      <isParallelStep>false</isParallelStep>
+      <isSingleResponse>false</isSingleResponse>
+      <recordInHistory>false</recordInHistory>
+      <recordRawOutput>true</recordRawOutput>
+      <recordPrimaryOutput>true</recordPrimaryOutput>
+      <checkPointStep>true</checkPointStep>
+      <historyCheckPointStep>true</historyCheckPointStep>
+      <scriptResultStep>false</scriptResultStep>
+      <userPrompt></userPrompt>
+      <bindings/>
+      <transitions>
+        <transition id="e554c1fe-53fb-497a-912a-9d6c81897018">
+          <annotation></annotation>
+          <name>return</name>
+          <command>NEXT</command>
+          <linkMode>false</linkMode>
+          <responseSymbol>success</responseSymbol>
+          <shouldHandoff>false</shouldHandoff>
+          <transitionValue>0.0</transitionValue>
+          <destination>
+            <refId>e175e3c7-4a84-4b12-b9d0-61eef1660a33</refId>
+          </destination>
+          <source>
+            <refId>e175e3c7-4a84-4b12-b9d0-61eef1660a33</refId>
+          </source>
+          <positions/>
+        </transition>
+      </transitions>
+      <properties/>
+      <returnStepType>RESOLVED</returnStepType>
+      <assignments/>
+    </returnStep>
+  </steps>
+  <startSteps>6ebce5c9-801a-4384-81c5-68d2f68f0013</startSteps>
+</flow>
