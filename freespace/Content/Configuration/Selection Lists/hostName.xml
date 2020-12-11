@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<selectionList id="b717f278-65dc-4a52-b061-e8de865a5bee">
+  <descriptionCdata><![CDATA[]]></descriptionCdata>
+  <annotation></annotation>
+  <name>hostName</name>
+  <storage>
+    <string>192.168.0.102</string>
+  </storage>
+</selectionList>
